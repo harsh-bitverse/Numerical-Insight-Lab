@@ -230,6 +230,31 @@ def test_inhomogeneous_defect_solver_enforcement():
     expected_bc1 = 0.0 - mock_predict(pts_bc1).flatten()
     assert np.allclose(e[:, -1], expected_bc1, atol=1e-12), "Inhomogeneous solver right BC mismatch"
 
+    # Mathematical Equivalence Invariant:
+    # When predictor satisfies exact boundary and initial conditions,
+    # InhomogeneousFDMSolverHeatEq MUST yield identical results to standard FDMSolverHeatEq
+    def exact_predict(xy):
+        x_c = xy[:, 0:1]
+        t_c = xy[:, 1:2]
+        return np.exp(-4.0 * (np.pi**2) * 0.05 * t_c) * np.sin(2.0 * np.pi * x_c)
+
+    def arb_residual(xy):
+        return np.cos(xy[:, 0:1] * 2 * np.pi)
+
+    inhom_exact = InhomogeneousFDMSolverHeatEq(
+        nx=nx, nt=nt, problem=problem, domain=problem.domain,
+        pinn_predict_fn=exact_predict, pinn_residual_fn=arb_residual
+    ).residual_integration_inhomogeneous()
+
+    hom_exact = FDMSolverHeatEq(
+        nx=nx, nt=nt, problem=problem, domain=problem.domain,
+        pinn_model=ModelWrapper(exact_predict, arb_residual)
+    ).residual_integration()
+
+    assert np.allclose(inhom_exact, hom_exact, atol=1e-14), (
+        "Inhomogeneous solver deviates from standard solver on zero boundary defects!"
+    )
+
 
 # ==============================================================================
 # Invariant 6: Correct residual source sign verification
@@ -259,8 +284,7 @@ def test_residual_source_sign():
     def mock_positive_residual(xy):
         return np.ones((xy.shape[0], 1)) * 2.0  # R(x, t) = +2.0
 
-
-    # Test InhomogeneousFDMSolverHeatEq
+    # 1. Test InhomogeneousFDMSolverHeatEq
     solver = InhomogeneousFDMSolverHeatEq(
         nx=nx, nt=nt, problem=problem, domain=problem.domain,
         pinn_predict_fn=mock_predict, pinn_residual_fn=mock_positive_residual
@@ -274,6 +298,17 @@ def test_residual_source_sign():
         f"got max interior value: {np.max(interior_e)}"
     )
     assert np.mean(interior_e) < -1e-4, "Error should be distinctly negative under positive residual"
+
+    # 2. Test upstream FDMSolverHeatEq as well
+    upstream_solver = FDMSolverHeatEq(
+        nx=nx, nt=nt, problem=problem, domain=problem.domain,
+        pinn_model=ModelWrapper(mock_predict, mock_positive_residual)
+    )
+    e_upstream = upstream_solver.residual_integration()
+    interior_upstream = e_upstream[1:, 1:-1]
+    assert np.all(interior_upstream <= 1e-12), "Upstream solver residual source sign error!"
+    assert np.mean(interior_upstream) < -1e-4, "Upstream solver should produce negative error"
+
 
 
 # ==============================================================================

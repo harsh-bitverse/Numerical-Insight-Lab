@@ -322,16 +322,17 @@ To maintain rigorous contingency planning, two alternative research questions we
 
 ---
 
-### 5.3 Consolidated Solo Action Plan (Sessions 6C to 7)
+### 5.3 Consolidated Solo Action Plan (Sessions 6C to 6E)
 
-| Priority | Task ID | Description | Target Deliverable / File | Estimated Effort | Status |
+| Priority | Task ID | Description | Target Deliverable / File | Status | Verification Checkpoint |
 | :---: | :---: | :--- | :--- | :---: | :---: |
-| **P1** | **6C.1** | Author Literature Gap Assessment & Research Design document | [`Docs/research_gap_assessment.md`](file:///c:/Workspace/Research/NA%20Research%20work%20on%20PINN/Docs/research_gap_assessment.md) | Current | **COMPLETE** |
-| **P2** | **6C.2** | Stage, commit, and push document checkpoint to GitHub `origin/main` | Git commit & push | 5 mins | **PENDING** |
-| **P3** | **7.1** | Create automated loss curve generation script (Deliverable A6 closure) | `scripts/plot_loss_curve.py`<br>`figures/training_loss_progression.png` | 30 mins | Next Session |
-| **P4** | **7.2** | Implement formal standalone `pytest` test suite (Deliverable B3 closure) | `tests/test_reproducibility.py` | 45 mins | Next Session |
-| **P5** | **7.3** | Implement cache-safe boundary penalty sweep script and run experiments | `scripts/run_boundary_penalty_study.py`<br>`results/boundary_penalty_study.csv` | 45 mins | Next Session |
-| **P6** | **7.4** | Synthesize findings into final submission package and viva presentation | `Docs/final_research_report.md`<br>`Docs/viva_preparation.md` | 1 hour | Next Session |
+| **P1** | **6C.1** | Author Literature Gap Assessment & Research Design document | [`Docs/research_gap_assessment.md`](file:///c:/Workspace/Research/NA%20Research%20work%20on%20PINN/Docs/research_gap_assessment.md) | **COMPLETE** | Pushed in Session 6C (`76e0974`) |
+| **P2** | **6D.1** | Patch cryptographic model cache collision vulnerability | [`scripts/model_cache.py`](file:///c:/Workspace/Research/NA%20Research%20work%20on%20PINN/scripts/model_cache.py) | **COMPLETE** | Verified in Session 6D |
+| **P3** | **6D.2** | Create automated loss curve generation script (Deliverable A6 closure) | [`scripts/plot_loss_curve.py`](file:///c:/Workspace/Research/NA%20Research%20work%20on%20PINN/scripts/plot_loss_curve.py)<br>[`figures/training_loss_progression.png`](file:///c:/Workspace/Research/NA%20Research%20work%20on%20PINN/figures/training_loss_progression.png) | **COMPLETE** | Verified in Session 6D |
+| **P4** | **6D.3** | Implement formal standalone `pytest` test suite (Deliverable B3 closure) | [`tests/test_reproducibility.py`](file:///c:/Workspace/Research/NA%20Research%20work%20on%20PINN/tests/test_reproducibility.py) | **COMPLETE** | 8/8 tests pass (`pytest -v`) |
+| **P5** | **6D.4** | Implement cache-safe boundary penalty sweep script and run experiments | [`scripts/run_penalty_sweep.py`](file:///c:/Workspace/Research/NA%20Research%20work%20on%20PINN/scripts/run_penalty_sweep.py)<br>[`results/penalty_sweep/heat_penalty_sweep.csv`](file:///c:/Workspace/Research/NA%20Research%20work%20on%20PINN/results/penalty_sweep/heat_penalty_sweep.csv) | **COMPLETE** | Executed in Session 6D (`151f9a9`) |
+| **P6** | **6E.1** | Independent bit-for-bit audit of penalty sweep raw outputs and fits | [`scripts/audit_penalty_sweep.py`](file:///c:/Workspace/Research/NA%20Research%20work%20on%20PINN/scripts/audit_penalty_sweep.py)<br>[`Docs/penalty_sweep_analysis.md`](file:///c:/Workspace/Research/NA%20Research%20work%20on%20PINN/Docs/penalty_sweep_analysis.md) | **COMPLETE** | Audited in Session 6E ($3.2 \times 10^{-15}$ max diff) |
+| **P7** | **6E.2** | Final documentation calibration and viva preparation | [`Docs/final_research_report.md`](file:///c:/Workspace/Research/NA%20Research%20work%20on%20PINN/Docs/final_research_report.md)<br>[`Docs/viva_preparation.md`](file:///c:/Workspace/Research/NA%20Research%20work%20on%20PINN/Docs/viva_preparation.md) | **COMPLETE** | Session 6E Checkpoint |
 
 ---
 
@@ -353,7 +354,7 @@ To maintain rigorous contingency planning, two alternative research questions we
 ## 7. Document Provenance & Verification
 
 * **Repository:** `https://github.com/harsh-bitverse/Numerical-Insight-Lab`
-* **Base Commit:** `41d31aec436485f04beb86582b6eb232ea6bf2a3`
+* **Base Commit:** `151f9a980bfcf991bd3b6f33f632f8c0c7ed2300`
 * **Author:** Harsh Sharma
 * **Verification Command:** `git status --short`
 * **Status:** Ready for staging, commit, and push to GitHub `main` branch.

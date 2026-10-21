@@ -26,7 +26,7 @@ flowchart TD
     subgraph EmpiricalFindings["Key Experimental Discoveries"]
         E1["Inhomogeneous Estimator Invariance:<br>Second-order convergence (p = 2.00, 1.99, 2.00, 1.98)<br>strictly preserved across all 4 penalty regimes."]
         E2["Naive Homogeneous Estimator Breakdown:<br>Complete convergence stalling (p = 0.00 to 0.16)<br>across all grids; discrepancy bounded by boundary departure."]
-        E3["Gradient Stiffness Pathology:<br>At lambda_bc = 1000, boundary weighting overpowers IC/PDE terms,<br>degrading true PINN error from 1.1e-3 to 0.35."]
+        E3["Observed Loss Imbalance (Consistent with Gradient Stiffness):<br>At lambda_bc = 1000, boundary loss overpowers IC loss,<br>degrading true PINN error from 1.1e-3 to 0.35."]
         E4["Estimator Robustness Under PINN Failure:<br>Even when PINN error degrades to 0.35, inhomogeneous estimator<br>estimates error with 1.6e-4 accuracy (p = 1.98)."]
     end
 ```
@@ -36,8 +36,8 @@ flowchart TD
    The inhomogeneous defect estimator (`InhomogeneousFDMSolverHeatEq`) exhibits near-perfect second-order convergence ($p = 2.00 \pm 0.02$) across all 4 penalty weights ($\lambda_{\text{bc}} = 1, 10, 100, 1000$), matching the theoretical Crank-Nicolson truncation error $\mathcal{O}(\Delta x^2 + \Delta t^2)$.
 2. **Hypothesis 2 (Naive Defect Stagnation) — FULLY CONFIRMED:**  
    The author's original homogeneous solver (`FDMSolverHeatEq`) completely fails to converge under grid refinement ($p = 0.00, 0.16, 0.07, 0.00$), exhibiting an error plateau directly dominated by the unmodeled boundary defect.
-3. **Hypothesis 3 (Gradient Pathology Trade-off) — CONFIRMED & DEMONSTRATED:**  
-   Increasing $\lambda_{\text{bc}}$ from $1 \to 10$ slightly improves boundary conformity, but pushing $\lambda_{\text{bc}} \to 1000$ creates severe optimization stiffness. Because boundary gradients overpower the initial condition loss ($\lambda_{\text{ic}}=1.0$), true PINN error degrades from $1.15 \times 10^{-3}$ to $0.3518$.
+3. **Hypothesis 3 (Loss Imbalance & Optimization Trade-off) — EMPIRICALLY DEMONSTRATED:**  
+   Increasing $\lambda_{\text{bc}}$ from $1 \to 10$ slightly improves boundary conformity, but pushing $\lambda_{\text{bc}} \to 1000$ leads to severe loss imbalance on this exploratory run (`seed=42`). Because the boundary loss is weighted $1000\times$, the optimizer prioritizes boundary residuals while the initial condition loss ($\lambda_{\text{ic}}=1.0$) stalls at $\mathcal{L}_{\text{ic}} \approx 0.498$, causing true PINN error to degrade from $1.15 \times 10^{-3}$ to $0.3518$. We note this is consistent with multi-objective gradient conflict pathologies described by Wang et al. (2021), though gradient norms during backpropagation were not directly logged in this run.
 4. **Hypothesis 4 (Decoupled Estimator Fidelity) — DISCOVERED:**  
    Even when the neural network is severely degraded by optimization pathology at $\lambda_{\text{bc}}=1000$ ($e_{\text{true}} \approx 0.35$), the inhomogeneous defect estimator accurately predicts the true error field with discrepancy $\Delta_{\text{inhom}} = 1.613 \times 10^{-4}$ at $64 \times 64$, maintaining asymptotic second-order convergence ($p = 1.98$).
 
@@ -76,6 +76,23 @@ flowchart TD
 
 ---
 
+### 2.3 Compact Consolidated Summary & Methodological Guardrails
+
+| Boundary Weight $\lambda_{\text{bc}}$ | True PINN Error $\|e_{\text{true}}\|$ | Direct FDM Error $\|\Delta_{\text{FDM}}\|$ | Inhom. Discrepancy $\|\Delta_{\text{inhom}}\|$ | Inhom. Order $p_{\text{fit}}$ | Inhom. Advantage $\eta_{\text{inhom}}$ | Naive Discrepancy $\|\Delta_{\text{naive}}\|$ | Naive Order $p_{\text{fit}}$ | Naive Advantage $\eta_{\text{naive}}$ |
+| :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| **$\lambda_{\text{bc}} = 1$** | $1.147 \times 10^{-3}$ | $1.613 \times 10^{-4}$ | $1.737 \times 10^{-6}$ | **$2.00$** | **$92.83\times$** | $1.653 \times 10^{-3}$ | $0.00$ | $0.098\times$ |
+| **$\lambda_{\text{bc}} = 10$** | $1.110 \times 10^{-3}$ | $1.613 \times 10^{-4}$ | $5.750 \times 10^{-6}$ | **$1.99$** | **$28.05\times$** | $9.682 \times 10^{-4}$ | $0.16$ | $0.167\times$ |
+| **$\lambda_{\text{bc}} = 100$** | $6.354 \times 10^{-3}$ | $1.613 \times 10^{-4}$ | $1.700 \times 10^{-5}$ | **$2.00$** | **$9.48\times$** | $6.099 \times 10^{-3}$ | $0.07$ | $0.026\times$ |
+| **$\lambda_{\text{bc}} = 1000$** | $3.518 \times 10^{-1}$ | $1.613 \times 10^{-4}$ | $1.613 \times 10^{-4}$ | **$1.98$** | **$1.00\times$** | $3.516 \times 10^{-1}$ | $0.00$ | $0.00046\times$ |
+
+#### Methodological Clarifications:
+1. **Zero Information Leakage:** Neither the homogeneous nor the inhomogeneous estimator accesses the analytical solution $u_{\text{true}}(x, t)$. All boundary departures $\delta_b(t) = g(t) - \hat{u}(x_b, t)$ and initial mismatches $\delta_{\text{ic}}(x) = u_0(x) - \hat{u}(x, 0)$ are evaluated purely using the prescribed problem boundary functions $g(t) = 0$ and initial condition function $u_0(x) = \sin(2\pi x)$.
+2. **Fixed-Grid Accuracy vs. Multi-Grid Convergence:** At fixed resolution $64 \times 64$, estimator discrepancy varies with residual scale ($1.737 \times 10^{-6}$ at $\lambda=1$ vs $1.613 \times 10^{-4}$ at $\lambda=1000$). However, across grid refinements ($16 \to 32 \to 64$), the asymptotic convergence order is strictly invariant at $p = 1.98 - 2.00$.
+3. **Mathematical Parity at $\lambda_{\text{bc}}=1000$ ($\eta \approx 1.00\times$):** At $\lambda_{\text{bc}}=1000$, $\|\Delta_{\text{inhom}}\|_{\text{RMS}} = 1.613008 \times 10^{-4}$ coincides with $\|\Delta_{\text{FDM}}\|_{\text{RMS}} = 1.612600 \times 10^{-4}$ to 4 significant digits. This is not a numerical coincidence: when initial condition loss stalls ($\mathcal{L}_{\text{ic}} \approx 0.498$), the network prediction is severely attenuated ($\hat{u} \approx 0$), making the defect equation $\partial_t e - \alpha \partial_{xx} e = -R$ mathematically equivalent to solving the original heat equation itself. Thus, Crank-Nicolson integration of the defect equation produces the exact same truncation error as solving the heat equation directly via Crank-Nicolson.
+4. **Single-Seed Scope:** While the baseline reproduction audited $n=10$ random seeds, this penalty sweep represents a focused exploratory parametric study on `seed=42`.
+
+---
+
 ## 3. Deep-Dive Scientific Analysis
 
 ### 3.1 Proof of Estimator Second-Order Invariance (Hypothesis 1)
@@ -93,10 +110,11 @@ where $w(x, t)$ is the continuous harmonic defect wave driven by the boundary de
 * For $\lambda_{\text{bc}} = 1000$: $\|\Delta_{\text{naive}}\|_{\text{RMS}} = 0.3516$ at $64 \times 64$, whereas at $16 \times 16$ it is $0.3522$ ($p = 0.00$).
 Because the error floor is set by the neural network's boundary violation and not by the FDM grid, grid refinement cannot reduce naive estimator error. In all cases, $\eta_{\text{naive}} \ll 1$, meaning **the author's unmodified estimator is up to $2100\times$ less accurate than running a standard direct FDM simulation**.
 
-### 3.3 Gradient Pathology and Multi-Objective Optimization (Hypothesis 3)
+### 3.3 Loss Imbalance and Multi-Objective Optimization Trade-Offs (Hypothesis 3)
 As predicted by Wang et al. (2021), soft-constrained PINNs exhibit severe multi-objective optimization competition:
 * When $\lambda_{\text{bc}} = 1$, all loss components have equal weight. The network achieves balanced convergence: $\mathcal{L}_{\text{pde}} \sim 1.88 \times 10^{-5}$, $\mathcal{L}_{\text{bc}} \sim 2.0 \times 10^{-6}$, $\mathcal{L}_{\text{ic}} \sim 4.6 \times 10^{-6}$, producing a low overall prediction error $e_{\text{true}} = 1.15 \times 10^{-3}$.
-* When $\lambda_{\text{bc}} = 1000$, the boundary loss is scaled by $10^3$. The Adam optimizer's gradients become dominated by boundary point errors. In consequence, the optimizer heavily over-prioritizes the boundary, causing catastrophic gradient starvation for the initial condition loss ($\lambda_{\text{ic}}=1.0$). At iteration 10,000, initial condition loss is stalled at $\mathcal{L}_{\text{ic}} \approx 0.498$, driving the neural network's true error up by two orders of magnitude to $e_{\text{true}} = 0.3518$.
+* When $\lambda_{\text{bc}} = 1000$, the boundary loss is scaled by $10^3$. The Adam optimizer's updates become heavily dominated by boundary point penalties. In consequence, the optimizer prioritizes boundary conformity while initial condition loss stalls at $\mathcal{L}_{\text{ic}} \approx 0.498$, driving the neural network's true error up to $e_{\text{true}} = 0.3518$.
+* *Epistemic Calibration:* We frame this finding as an observed loss trade-off that is *consistent with* the gradient conflict pathologies documented by Wang et al. (2021), while noting that backpropagation gradient vectors were not directly logged during this training run. Multi-seed studies would further establish statistical distributions of this trade-off.
 
 ### 3.4 Decoupling of Estimator Discrepancy from PINN Prediction Error
 A pivotal conceptual distinction demonstrated by this experiment is the difference between:
@@ -127,4 +145,8 @@ At $\lambda_{\text{bc}} = 1000$, the neural network failed as a PDE solver ($e_{
 * **Examiner:** *"Why did the naive estimator fail so badly at $\lambda_{\text{bc}} = 1000$ ($3.5 \times 10^{-1}$ discrepancy)?"*  
   * **Response:** *"At $\lambda_{\text{bc}}=1000$, the optimizer suffered from gradient pathology, causing large initial errors at $t=0$. Because the naive estimator assumes zero initial defect ($e(x, 0) \equiv 0$) and zero boundary error, it missed the entire initial error wave, producing a discrepancy equal to the magnitude of the initial error itself."*
 * **Examiner:** *"Why does the advantage factor decrease from $92.8\times$ at $\lambda_{\text{bc}}=1$ to $1.0\times$ at $\lambda_{\text{bc}}=1000$?"*  
-  * **Response:** *"The advantage factor is defined as $\eta := \|\Delta_{\text{FDM}}\| / \|\Delta_{\text{res}}\|$. When the PINN is well-trained ($\lambda_{\text{bc}}=1$), the residual estimator error is $\sim 1.7 \times 10^{-6}$, providing a $92.8\times$ advantage over direct FDM ($1.6 \times 10^{-4}$). When the PINN is poorly trained due to stiffness ($\lambda_{\text{bc}}=1000$), the estimator error reaches $1.6 \times 10^{-4}$, which equals direct FDM error ($\eta \approx 1.00\times$). At parity, the estimator neither beats nor loses to direct FDM."*
+  * **Response:** *"The advantage factor is defined as $\eta := \|\Delta_{\text{FDM}}\| / \|\Delta_{\text{res}}\|$. When the PINN is well-trained ($\lambda_{\text{bc}}=1$), the residual estimator error is $\sim 1.7 \times 10^{-6}$, providing a $92.8\times$ advantage over direct FDM ($1.6 \times 10^{-4}$). When the PINN is poorly trained due to loss imbalance ($\lambda_{\text{bc}}=1000$), the estimator error reaches $1.613 \times 10^{-4}$, which equals direct FDM error ($\eta \approx 1.00\times$). At parity, Crank-Nicolson integration of the defect equation is mathematically equivalent to Crank-Nicolson integration of the heat equation itself."*
+* **Examiner:** *"Does your inhomogeneous estimator leak or depend on the exact analytical ground truth?"*  
+  * **Response:** *"No. Zero analytical ground truth is used. Boundary and initial defects are computed strictly against the specified problem data: $\delta_b(t) = 0 - \hat{u}(x_b, t)$ and $\delta_{\text{ic}}(x) = \sin(2\pi x) - \hat{u}(x, 0)$. In any practical application where boundary conditions $g(t)$ and initial data $u_0(x)$ are given, these defects are computable directly from the problem statement without knowing $u(x, t)$."*
+* **Examiner:** *"Can you claim that $\lambda_{\text{bc}}=1000$ always fails due to gradient stiffness?"*  
+  * **Response:** *"We observe severe loss imbalance on `seed=42` where $\mathcal{L}_{\text{ic}}$ stalls at $0.498$ under the $1000\times$ boundary penalty. While this behavior is fully consistent with the multi-objective gradient conflict pathologies described by Wang et al. (2021), we strictly report this as an empirical finding on this seed, as parameter-level backpropagation gradients were not directly logged during training."*

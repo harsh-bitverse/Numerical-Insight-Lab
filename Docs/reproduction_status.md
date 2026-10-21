@@ -4,7 +4,7 @@
 **Target Paper:** *Building Trust in PINNs: Error Estimation through Finite Difference Methods* ([arXiv:2603.15526](https://arxiv.org/abs/2603.15526))  
 **Official Codebase:** Pinned at commit [`460d66b`](https://github.com/aleks-krasowski/pinn-fdm-error-estimation)  
 **Course Deadline:** November 10, 2026  
-**Current Milestone:** Session 6D Completed (Cryptographic Cache Integrity, Invariant Tests, Loss Progression Curves, and Boundary Penalty Sensitivity Study Verified)
+**Current Milestone:** Session 6E Completed (Independent Bit-for-Bit Audit, Mathematical Invariants, Calibrated Scientific Interpretations, and Document Synchronization)
 
 ---
 
@@ -19,8 +19,9 @@
   5. The controlled grid-resolution study across $N_x \in [8, 256]$ demonstrated theoretical second-order convergence ($p \approx 1.99$).
   6. The boundary condition extension demonstrated the breakdown of the upstream code on soft PINNs ($p = 0.00$) and restored observed second-order convergence ($p = 1.99 \pm 0.01$) with an elevated $85.67\times$ advantage factor via `InhomogeneousFDMSolverHeatEq`.
   7. Cryptographic cache integrity ([`scripts/model_cache.py`](file:///c:/Workspace/Research/NA%20Research%20work%20on%20PINN/scripts/model_cache.py)) was implemented with SHA-256 fingerprinting and strict metadata validation, preventing silent checkpoint collisions across hyperparameters.
-  8. Focused invariant test suite ([`tests/test_reproducibility.py`](file:///c:/Workspace/Research/NA%20Research%20work%20on%20PINN/tests/test_reproducibility.py)) passed 8/8 tests in 2.03s under `pytest`.
-  9. Controlled boundary penalty study across $\lambda_{\text{bc}} \in \{1, 10, 100, 1000\}$ ([`Docs/penalty_sweep_analysis.md`](file:///c:/Workspace/Research/NA%20Research%20work%20on%20PINN/Docs/penalty_sweep_analysis.md)) proved that the inhomogeneous defect estimator retains second-order convergence ($p = 2.00, 1.99, 2.00, 1.98$) across all penalty regimes, while revealing severe gradient stiffness pathology at $\lambda_{\text{bc}}=1000$.
+  8. Focused invariant test suite ([`tests/test_reproducibility.py`](file:///c:/Workspace/Research/NA%20Research%20work%20on%20PINN/tests/test_reproducibility.py)) passed 8/8 tests in 2.05s under `pytest`, including solver equivalence under zero defect and residual sign checks.
+  9. Controlled boundary penalty study across $\lambda_{\text{bc}} \in \{1, 10, 100, 1000\}$ ([`Docs/penalty_sweep_analysis.md`](file:///c:/Workspace/Research/NA%20Research%20work%20on%20PINN/Docs/penalty_sweep_analysis.md)) proved that the inhomogeneous defect estimator retains second-order convergence ($p = 2.00, 1.99, 2.00, 1.98$) across all penalty regimes, while revealing an empirical loss trade-off at $\lambda_{\text{bc}}=1000$ consistent with multi-objective gradient conflict pathologies.
+  10. Independent bit-for-bit audit ([`scripts/audit_penalty_sweep.py`](file:///c:/Workspace/Research/NA%20Research%20work%20on%20PINN/scripts/audit_penalty_sweep.py)) verified all 24 grid rows and 8 convergence fits from raw checkpoint weights with a maximum absolute discrepancy of $3.22 \times 10^{-15}$ against stored CSVs.
 
 
 ---
