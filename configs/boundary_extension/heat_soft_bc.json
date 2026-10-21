@@ -1,0 +1,44 @@
+{
+  "study_name": "heat_1d_boundary_condition_extension",
+  "problem": "heat",
+  "problem_kwargs": {
+    "x_min": 0.0,
+    "x_max": 1.0,
+    "t_max": 1.0,
+    "diffusivity": 0.05,
+    "frequency": 2.0
+  },
+  "grid_size": {
+    "nx": 64,
+    "nt": 64
+  },
+  "pinn_config": {
+    "layers": [2, 20, 20, 20, 1],
+    "activation": "tanh",
+    "n_iterations": 10000,
+    "num_domain": 10000,
+    "num_boundary": 1000,
+    "num_initial": 1000,
+    "learning_rate": 0.001,
+    "seed": 42
+  },
+  "comparisons": [
+    {
+      "mode": "hard_bc",
+      "solver": "standard_homogeneous",
+      "description": "Baseline Hard BC with standard homogeneous residual solver"
+    },
+    {
+      "mode": "soft_bc",
+      "solver": "inhomogeneous_defect",
+      "description": "Soft BC with mathematically consistent inhomogeneous residual solver"
+    },
+    {
+      "mode": "soft_bc",
+      "solver": "naive_homogeneous",
+      "description": "Soft BC with naive homogeneous residual solver (testing assumption violation)"
+    }
+  ],
+  "precision": "float64",
+  "device": "cpu"
+}

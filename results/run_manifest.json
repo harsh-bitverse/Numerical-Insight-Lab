@@ -1,0 +1,116 @@
+{
+  "project": "Reproducing and Evaluating Finite-Difference Error Estimation in Physics-Informed Neural Networks",
+  "upstream_repository": "https://github.com/aleks-krasowski/pinn-fdm-error-estimation",
+  "upstream_commit": "460d66bc2a59720883fa6a06e8c5436db4f99020",
+  "environment": {
+    "python_version": "3.12.10",
+    "platform": "Windows-10",
+    "device": "CPU",
+    "precision": "float64",
+    "packages": {
+      "torch": "2.14.1",
+      "deepxde": "1.15.0",
+      "numpy": "2.5.4",
+      "scipy": "1.18.1",
+      "matplotlib": "3.11.2",
+      "seaborn": "0.13.2",
+      "polars": "2.0.0"
+    }
+  },
+  "runs": [
+    {
+      "run_id": "diagnostic_smoke_run",
+      "type": "diagnostic",
+      "problem": "heat",
+      "status": "success",
+      "exit_code": 0,
+      "command": ".\\.venv\\Scripts\\python.exe upstream/pinn-fdm-error-estimation/examples/run_experiment.py --problem heat --n_iterations 10 --num_domain 100 --nx 16 --nt 16 --seed 42 --diffusivity 0.05 --frequency 2 --no_show",
+      "timestamp_start": "2026-10-20T18:21:22.0614153+05:30",
+      "timestamp_end": "2026-10-20T18:21:26.9562920+05:30",
+      "elapsed_wallclock_seconds": 4.8855,
+      "parameters": {
+        "n_iterations": 10,
+        "num_domain": 100,
+        "nx": 16,
+        "nt": 16,
+        "seed": 42,
+        "diffusivity": 0.05,
+        "frequency": 2,
+        "x_min": 0.0,
+        "x_max": 1.0,
+        "t_max": 1.0
+      },
+      "measured_metrics": {
+        "pinn_time_seconds": 0.0507,
+        "e_res_time_seconds": 0.0225,
+        "fdm_time_seconds": 0.0010,
+        "e_bound_time_seconds": 0.29,
+        "pinn_error_l2": 0.4131827,
+        "pinn_error_max": 0.9004861,
+        "e_res_l2": 0.4166780,
+        "e_res_diff_l2": 0.003585240,
+        "e_res_diff_max": 0.008951393,
+        "e_fdm_l2": 0.4105422,
+        "e_fdm_diff_l2": 0.002749211,
+        "e_fdm_diff_max": 0.004838733,
+        "advantage_factor": 0.767
+      },
+      "artifacts": [
+        "results/diagnostic_run/diagnostic_heat_results.png",
+        "results/diagnostic_run/diagnostic_heat_eq_err_comparison_time.pdf",
+        "upstream/pinn-fdm-error-estimation/model_zoo/aaeda4025be66124.pt"
+      ]
+    },
+    {
+      "run_id": "baseline_heat_64x64",
+      "type": "paper_reproduction",
+      "problem": "heat",
+      "status": "success",
+      "exit_code": 0,
+      "command": ".\\.venv\\Scripts\\python.exe upstream/pinn-fdm-error-estimation/examples/run_experiment.py --problem heat --n_iterations 10000 --num_domain 10000 --nx 64 --nt 64 --seed 42 --diffusivity 0.05 --frequency 2 --no_show",
+      "timestamp_start": "2026-10-20T18:22:08.5998836+05:30",
+      "timestamp_end": "2026-10-20T18:24:59.5933374+05:30",
+      "elapsed_wallclock_seconds": 170.9859,
+      "parameters": {
+        "n_iterations": 10000,
+        "num_domain": 10000,
+        "nx": 64,
+        "nt": 64,
+        "seed": 42,
+        "diffusivity": 0.05,
+        "frequency": 2,
+        "x_min": 0.0,
+        "x_max": 1.0,
+        "t_max": 1.0
+      },
+      "measured_metrics": {
+        "pinn_time_seconds": 161.7725,
+        "e_res_time_seconds": 0.1167,
+        "fdm_time_seconds": 0.0040,
+        "e_bound_time_seconds": 4.43,
+        "pinn_error_l2": 1.051475e-04,
+        "pinn_error_max": 4.801462e-04,
+        "e_res_l2": 1.069686e-04,
+        "e_res_diff_l2": 4.771048e-06,
+        "e_res_diff_max": 2.121148e-05,
+        "e_fdm_l2": 1.817874e-04,
+        "e_fdm_diff_l2": 1.612600e-04,
+        "e_fdm_diff_max": 2.748222e-04,
+        "advantage_factor": 33.80
+      },
+      "author_reference_comparison": {
+        "author_reference_file": "upstream/pinn-fdm-error-estimation/results/all_experiments_results_float64.csv",
+        "author_e_res_diff_l2_mean_10seeds": 5.975575e-06,
+        "author_e_res_diff_l2_std_10seeds": 9.914086e-07,
+        "author_e_fdm_diff_l2_exact": 1.612600e-04,
+        "match_verdict": "exact_deterministic_match_on_fdm_and_within_1.2_sigma_on_pinn_residual"
+      },
+      "artifacts": [
+        "results/baseline_run/baseline_heat_results.png",
+        "results/baseline_run/baseline_heat_eq_err_comparison_time.pdf",
+        "upstream/pinn-fdm-error-estimation/model_zoo/cb2ee0641f1f8be8.pt",
+        "upstream/pinn-fdm-error-estimation/model_zoo/cb2ee0641f1f8be8.json"
+      ]
+    }
+  ]
+}
