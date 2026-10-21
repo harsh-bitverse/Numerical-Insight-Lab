@@ -147,10 +147,12 @@ The current package already satisfies all 5 core research priorities agreed upon
 
 Because the student is now working alone under a November 10 deadline, **no major new architectural overhauls (e.g., implementing 2D Navier-Stokes or rewriting DeepXDE) should be attempted**. The core project is already academically defensible and complete.
 
-The only genuine gaps are:
-1. Creating a formal standalone automated test script (`tests/test_reproducibility.py`) to replace ad-hoc scratch assertions.
-2. Generating a clean training loss curve visualization (`figures/training_loss_progression.png`) to close deliverable A6.
-3. Conducting a small, highly targeted parametric sensitivity study on boundary penalty weights ($\lambda_{\text{bc}}$) to deepen the soft-BC analysis without modifying solver code.
+The residual engineering gaps identified were formally closed in Session 6D:
+1. **Automated Test Suite (Deliverable B3):** Created [`tests/test_reproducibility.py`](file:///c:/Workspace/Research/NA%20Research%20work%20on%20PINN/tests/test_reproducibility.py), passing 8/8 invariant checks in 2.03s under `pytest`.
+2. **Loss History Visualization (Deliverable A6):** Implemented [`scripts/plot_loss_curve.py`](file:///c:/Workspace/Research/NA%20Research%20work%20on%20PINN/scripts/plot_loss_curve.py) and generated [`figures/training_loss_progression.png`](file:///c:/Workspace/Research/NA%20Research%20work%20on%20PINN/figures/training_loss_progression.png).
+3. **Cache Integrity Protection:** Resolved the cache collision vulnerability via cryptographic SHA-256 fingerprinting in [`scripts/model_cache.py`](file:///c:/Workspace/Research/NA%20Research%20work%20on%20PINN/scripts/model_cache.py).
+4. **Boundary Penalty Study:** Executed the parameter sweep in [`scripts/run_penalty_sweep.py`](file:///c:/Workspace/Research/NA%20Research%20work%20on%20PINN/scripts/run_penalty_sweep.py) across $\lambda_{\text{bc}} \in \{1, 10, 100, 1000\}$, proving second-order invariance ($p \approx 2.0$) for inhomogeneous estimation ([`Docs/penalty_sweep_analysis.md`](file:///c:/Workspace/Research/NA%20Research%20work%20on%20PINN/Docs/penalty_sweep_analysis.md)).
+
 
 ---
 

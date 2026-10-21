@@ -109,47 +109,20 @@ class ModelWrapper:
         self.residual = res_fn
 
 
+from scripts.model_cache import train_or_load_soft_pinn_safe
+
+
 def train_or_load_soft_pinn(problem, pinn_config, cache_dir="results/models"):
-    """Train or load cached soft-constrained PINN."""
-    os.makedirs(cache_dir, exist_ok=True)
-    cache_path = os.path.join(cache_dir, f"soft_pinn_seed{pinn_config['seed']}.pt")
-
-    geomtime = problem.create_geometry()
-    bc_l = dde.icbc.DirichletBC(geomtime, lambda x: 0.0, lambda x, on_boundary: on_boundary and np.isclose(x[0], 0.0))
-    bc_r = dde.icbc.DirichletBC(geomtime, lambda x: 0.0, lambda x, on_boundary: on_boundary and np.isclose(x[0], 1.0))
-    ic = dde.icbc.IC(geomtime, lambda x: np.sin(2.0 * np.pi * x[:, 0:1]), lambda x, on_initial: on_initial)
-
-    data = dde.data.TimePDE(
-        geometryxtime=geomtime,
-        pde=problem.pde,
-        ic_bcs=[bc_l, bc_r, ic],
-        num_domain=pinn_config["num_domain"],
-        num_boundary=pinn_config.get("num_boundary", 1000),
-        num_initial=pinn_config.get("num_initial", 1000),
+    """Train or load cached soft-constrained PINN with cryptographic cache integrity."""
+    model, train_time, _ = train_or_load_soft_pinn_safe(
+        problem=problem,
+        pinn_config=pinn_config,
+        cache_dir=cache_dir,
+        allow_legacy=True,
+        display_every=100
     )
-
-    dde.config.set_random_seed(pinn_config["seed"])
-    torch.manual_seed(pinn_config["seed"])
-    np.random.seed(pinn_config["seed"])
-
-    net = dde.nn.FNN(pinn_config["layers"], pinn_config["activation"], "Glorot normal")
-    model = dde.Model(data, net)
-    model.compile("adam", lr=pinn_config.get("learning_rate", 1e-3))
-
-    if os.path.exists(cache_path):
-        print(f"Loading cached Soft BC PINN from {cache_path}")
-        net.load_state_dict(torch.load(cache_path, map_location="cpu"))
-        train_time = 0.0
-    else:
-        print(f"Training Soft BC PINN for {pinn_config['n_iterations']} iterations...")
-        t0 = time.time()
-        model.train(iterations=pinn_config["n_iterations"])
-        train_time = time.time() - t0
-        print(f"Soft BC PINN training completed in {train_time:.2f} s")
-        torch.save(net.state_dict(), cache_path)
-        print(f"Saved Soft BC PINN weights to {cache_path}")
-
     return model, train_time
+
 
 
 def run_boundary_extension_study(config_path="configs/boundary_extension/heat_soft_bc.json"):

@@ -1,0 +1,43 @@
+{
+  "fingerprint": "1b087bb778d486ca420bb10e2f0fd730fcdf3652b564cff84f162f92d7a6f938",
+  "created_at": "2026-10-21T19:27:17.119197",
+  "train_time_seconds": 187.96485352516174,
+  "pytorch_version": "2.14.1+cpu",
+  "deepxde_version": "1.15.0",
+  "canonical_config": {
+    "problem": {
+      "pde_name": "heat_1d_sine_ic",
+      "x_min": 0.0,
+      "x_max": 1.0,
+      "t_max": 1.0,
+      "diffusivity": 0.05,
+      "frequency": 2.0
+    },
+    "layers": [
+      2,
+      20,
+      20,
+      20,
+      1
+    ],
+    "activation": "tanh",
+    "initializer": "Glorot normal",
+    "optimizer": "adam",
+    "learning_rate": 0.001,
+    "n_iterations": 10000,
+    "seed": 42,
+    "num_domain": 10000,
+    "num_boundary": 1000,
+    "num_initial": 1000,
+    "lambda_bc": 1.0,
+    "lambda_ic": 1.0,
+    "loss_weights": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "precision": "float64",
+    "device": "cpu"
+  }
+}

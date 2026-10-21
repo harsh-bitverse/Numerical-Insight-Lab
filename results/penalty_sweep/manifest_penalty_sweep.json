@@ -1,0 +1,62 @@
+{
+  "study": "heat_1d_boundary_penalty_sweep",
+  "timestamp": "2026-10-21T19:39:02.475540",
+  "config": {
+    "study_name": "heat_1d_boundary_penalty_sweep",
+    "problem": "heat",
+    "problem_kwargs": {
+      "x_min": 0.0,
+      "x_max": 1.0,
+      "t_max": 1.0,
+      "diffusivity": 0.05,
+      "frequency": 2.0
+    },
+    "penalty_weights": [
+      1.0,
+      10.0,
+      100.0,
+      1000.0
+    ],
+    "lambda_ic": 1.0,
+    "grid_resolutions": [
+      16,
+      32,
+      64
+    ],
+    "pinn_config": {
+      "layers": [
+        2,
+        20,
+        20,
+        20,
+        1
+      ],
+      "activation": "tanh",
+      "initializer": "Glorot normal",
+      "optimizer": "adam",
+      "learning_rate": 0.001,
+      "n_iterations": 10000,
+      "num_domain": 10000,
+      "num_boundary": 1000,
+      "num_initial": 1000,
+      "seed": 42,
+      "precision": "float64",
+      "device": "cpu"
+    },
+    "cache_dir": "results/models/penalty_sweep",
+    "results_dir": "results/penalty_sweep",
+    "loss_component_mapping": {
+      "index_0": "PDE interior residual (weight = 1.0)",
+      "index_1": "Left Dirichlet BC at x=0 (weight = lambda_bc)",
+      "index_2": "Right Dirichlet BC at x=1 (weight = lambda_bc)",
+      "index_3": "Initial condition at t=0 (weight = lambda_ic = 1.0)"
+    }
+  },
+  "results_csv": "results/penalty_sweep\\heat_penalty_sweep.csv",
+  "convergence_csv": "results/penalty_sweep\\convergence_orders.csv",
+  "figures": [
+    "figures/penalty_sweep_comparison.png",
+    "figures/training_loss_progression.png"
+  ],
+  "records_count": 24
+}
