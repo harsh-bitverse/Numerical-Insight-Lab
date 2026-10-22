@@ -2,8 +2,9 @@
 
 **Course:** Numerical Analysis Undergraduate Research Project  
 **Institution:** Indian Institute of Technology Delhi (IIT Delhi)  
-**Author & Sole Maintainer:** Harsh Sharma (Independent Study, Numerical Insight Lab, IIT Delhi)  
-**Workstream Transition Note:** Project originally conceived across three collaborative workstreams (Solvers, Training, Validation); consolidated and completed independently following course withdrawal of student teammates.  
+**Department:** Department of Chemical Engineering  
+**Authors:** Harshith N (Lead & Completing Author), Nilesh Kumar Verma, Devesh Saini  
+**Transition Note:** Originally conceived across three collaborative workstreams; consolidated and completed independently by Harshith N following course withdrawals.  
 **Supervisor / Course Instructor:** [Course Instructor Placeholder]  
 **Date:** October 2026 (Course Submission Deadline: November 10, 2026)  
 **Project Repository:** `https://github.com/harsh-bitverse/Numerical-Insight-Lab`  
