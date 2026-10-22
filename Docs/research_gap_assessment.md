@@ -4,7 +4,7 @@
 **Institution:** Indian Institute of Technology Delhi (IIT Delhi)  
 **Project:** Reproducing and Evaluating Finite-Difference Error Estimation in Physics-Informed Neural Networks  
 **Target Paper:** Aleks Krasowski et al., *Building Trust in PINNs: Error Estimation through Finite Difference Methods*, [arXiv:2603.15526](https://arxiv.org/abs/2603.15526) (2026)  
-**Author / Sole Project Owner:** Harsh Sharma (Numerical Insight Lab)  
+**Author and Collaborators:** Harshith N, Nilesh Kumar Verma, Devesh Saini  
 **Repository:** `https://github.com/harsh-bitverse/Numerical-Insight-Lab`  
 **Current Commit Checkpoint:** `41d31aec436485f04beb86582b6eb232ea6bf2a3`  
 **Submission Deadline:** November 10, 2026  
@@ -355,6 +355,6 @@ To maintain rigorous contingency planning, two alternative research questions we
 
 * **Repository:** `https://github.com/harsh-bitverse/Numerical-Insight-Lab`
 * **Base Commit:** `151f9a980bfcf991bd3b6f33f632f8c0c7ed2300`
-* **Author:** Harsh Sharma
+* **Author and Collaborators:** Harshith N, Nilesh Kumar Verma, Devesh Saini
 * **Verification Command:** `git status --short`
 * **Status:** Ready for staging, commit, and push to GitHub `main` branch.

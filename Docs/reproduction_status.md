@@ -1,6 +1,7 @@
 # Project Reproduction Status
 
 **Project Title:** Reproducing and Evaluating Finite-Difference Error Estimation in Physics-Informed Neural Networks  
+**Author and Collaborators:** Harshith N, Nilesh Kumar Verma, Devesh Saini  
 **Target Paper:** *Building Trust in PINNs: Error Estimation through Finite Difference Methods* ([arXiv:2603.15526](https://arxiv.org/abs/2603.15526))  
 **Official Codebase:** Pinned at commit [`460d66b`](https://github.com/aleks-krasowski/pinn-fdm-error-estimation)  
 **Course Deadline:** November 10, 2026  

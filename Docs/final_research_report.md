@@ -3,7 +3,7 @@
 **Course:** Numerical Analysis Undergraduate Research Project  
 **Institution:** Indian Institute of Technology Delhi (IIT Delhi)  
 **Department:** Department of Chemical Engineering  
-**Authors:** Harshith N (Lead & Completing Author), Nilesh Kumar Verma, Devesh Saini  
+**Author and Collaborators:** Harshith N, Nilesh Kumar Verma, Devesh Saini  
 **Transition Note:** Originally conceived across three collaborative workstreams; consolidated and completed independently by Harshith N following course withdrawals.  
 **Supervisor / Course Instructor:** [Course Instructor Placeholder]  
 **Date:** October 2026 (Course Submission Deadline: November 10, 2026)  

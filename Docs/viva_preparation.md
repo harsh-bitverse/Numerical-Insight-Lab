@@ -3,6 +3,7 @@
 **Course:** Numerical Analysis Undergraduate Research Project  
 **Institution:** Indian Institute of Technology Delhi (IIT Delhi)  
 **Project Title:** Reproducing and Evaluating Finite-Difference Error Estimation in Physics-Informed Neural Networks  
+**Author and Collaborators:** Harshith N, Nilesh Kumar Verma, Devesh Saini  
 **Target Paper:** Aleks Krasowski et al., *Building Trust in PINNs: Error Estimation through Finite Difference Methods*, [arXiv:2603.15526](https://arxiv.org/abs/2603.15526) (2026).  
 **Repository:** `https://github.com/harsh-bitverse/Numerical-Insight-Lab`
 
