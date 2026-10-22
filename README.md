@@ -30,30 +30,44 @@ Physics-Informed Neural Networks (PINNs) provide a mesh-free approach to differe
 Numerical-Insight-Lab/
 ├── Docs/                              # Authoritative documentation & reports
 │   ├── final_research_report.md       # Full academic paper & results narrative
-│   ├── team_handoff.md                # Student workstream handoff & task ownership
-│   ├── viva_preparation.md            # Comprehensive viva examination guide (25 Q&As)
+│   ├── penalty_sweep_analysis.md      # Detailed empirical analysis of boundary penalty sweep
+│   ├── research_gap_assessment.md     # Literature review & research design
+│   ├── solo_project_gap_audit.md      # Workstream consolidation & gap audit
+│   ├── team_handoff.md                # Technical workstream mapping & handoff
+│   ├── viva_preparation.md            # Comprehensive viva examination guide (28 Q&As)
 │   ├── metric_definitions.md          # Formal mathematical definitions & norm specs
 │   ├── baseline_validation.md         # Exact numerical audit against reference CSV
 │   ├── grid_study_analysis.md         # Grid study convergence tables & regression fits
 │   ├── boundary_extension_analysis.md # Hard vs Soft BC mathematical derivation & data
-│   ├── research_decision_log.md       # Chronological log of research decisions (1–7)
+│   ├── research_decision_log.md       # Chronological log of research decisions (1–8)
 │   ├── reproduction_status.md         # Project tracking against priority goals
 │   └── UPSTREAM_PROVENANCE.md         # Upstream commit hash, licenses & retrieval log
 ├── configs/                           # Experiment configuration files
 │   ├── grid_study/heat_grid_study.json
-│   └── boundary_extension/heat_soft_bc.json
+│   ├── boundary_extension/heat_soft_bc.json
+│   └── boundary_extension/heat_penalty_sweep.json
 ├── figures/                           # Generated diagnostic figures
 │   ├── grid_resolution_comparison.png # 6-level convergence plot vs author bands
-│   └── boundary_condition_comparison.png # 4-panel soft BC diagnostic figure
+│   ├── boundary_condition_comparison.png # 4-panel soft BC diagnostic figure
+│   ├── penalty_sweep_comparison.png   # 4-panel boundary penalty sweep comparison
+│   └── training_loss_progression.png  # Loss component evolution across penalty regimes
 ├── results/                           # Raw experimental metrics & run manifests
 │   ├── grid_study.csv                 # 12-run raw CSV metrics
 │   ├── boundary_extension.csv         # 12-run comparative extension CSV
 │   ├── run_manifest.json              # Baseline execution manifest & hardware hashes
 │   ├── grid_study/*.json              # Per-run execution manifests
-│   └── models/soft_pinn_seed42.pt     # Cached PyTorch weights for soft PINN
+│   ├── models/soft_pinn_seed42.pt     # Cached PyTorch weights for baseline soft PINN
+│   ├── models/penalty_sweep/          # Cached PyTorch weights & JSON metadata for penalty sweep
+│   └── penalty_sweep/                 # Penalty sweep CSVs, loss histories, and manifests
 ├── scripts/                           # Standalone reproduction & extension runners
 │   ├── run_grid_study.py              # Automated grid-resolution study runner
-│   └── run_boundary_extension.py      # Hard vs. Soft BC extension runner
+│   ├── run_boundary_extension.py      # Hard vs. Soft BC extension runner
+│   ├── run_penalty_sweep.py           # Controlled boundary penalty sweep runner
+│   ├── plot_loss_curve.py             # Training loss progression visualization
+│   ├── audit_penalty_sweep.py         # Independent raw data & convergence order audit tool
+│   └── model_cache.py                 # Cryptographic model caching & metadata validator
+├── tests/                             # Standalone verification test suite
+│   └── test_reproducibility.py        # 8 mathematical and implementation invariant tests
 ├── upstream/                          # Vendored upstream code (strictly read-only)
 │   └── pinn-fdm-error-estimation/     # Upstream snapshot at commit 460d66b
 └── logs/                              # Audit trails & quality assurance logs
@@ -88,19 +102,19 @@ source .venv/bin/activate
 # 4. Install dependencies
 pip install --upgrade pip
 pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
-pip install deepxde polars scipy matplotlib
+pip install deepxde polars scipy matplotlib pytest
 ```
 
 ---
 
 ## 4. Reproducing the Experiments
 
-All model weights are cached using SHA-256 configuration hashes. Once trained, subsequent runs evaluate in **under 5 seconds**.
+All model weights for the extension are cached in `results/models/` using SHA-256 configuration hashes. Once trained or loaded from committed checkpoints, evaluations complete in **under 10 seconds**.
 
-### A. Quick Smoke Test (< 5 seconds)
-Verifies environment setup and linear solver without training:
+### A. Run Invariant Test Suite (< 3 seconds)
+Executes all 8 formal mathematical and implementation invariant checks:
 ```bash
-python -c "import deepxde, torch, scipy, polars; print('Environment verified successfully.')"
+pytest -v tests/test_reproducibility.py
 ```
 
 ### B. Run Grid-Resolution Study ($N_x \in [8, 256]$)
@@ -108,6 +122,7 @@ Executes all 12 runs across well-trained (10,000 iters) and random-init (0 iters
 ```bash
 python scripts/run_grid_study.py --config configs/grid_study/heat_grid_study.json
 ```
+* **Execution Note on Fresh Clones:** If `upstream/.../model_zoo/` cache is absent, `run_grid_study.py` will train the baseline hard-PINN from scratch (~2.5 minutes on CPU) before caching and evaluating across all grid sizes. With existing cache, it evaluates in ~3 seconds.
 * **Outputs:** `results/grid_study.csv`, `figures/grid_resolution_comparison.png`, `results/grid_study/*.json`.
 
 ### C. Run Boundary Condition Extension Study
@@ -116,6 +131,26 @@ Executes the 3-way comparative evaluation (Hard BC Baseline vs. Soft BC Inhomoge
 python scripts/run_boundary_extension.py --config configs/boundary_extension/heat_soft_bc.json
 ```
 * **Outputs:** `results/boundary_extension.csv`, `figures/boundary_condition_comparison.png`, `results/models/soft_pinn_seed42.pt`.
+
+### D. Run Controlled Boundary Penalty Sweep ($\lambda_{\text{bc}} \in \{1, 10, 100, 1000\}$)
+Executes the parametric study evaluating boundary penalty scaling on soft PINNs:
+```bash
+python scripts/run_penalty_sweep.py --config configs/boundary_extension/heat_penalty_sweep.json
+```
+* **Outputs:** `results/penalty_sweep/heat_penalty_sweep.csv`, `results/penalty_sweep/convergence_orders.csv`, `figures/penalty_sweep_comparison.png`.
+
+### E. Independent Raw Data Audit (< 5 seconds)
+Recomputes all 24 grid evaluations and 8 convergence fits directly from checkpoint `.pt` files without relying on stored CSVs:
+```bash
+python scripts/audit_penalty_sweep.py
+```
+
+### F. Generate Training Loss Curves (< 2 seconds)
+Visualizes loss component evolution across training steps:
+```bash
+python scripts/plot_loss_curve.py
+```
+* **Outputs:** `figures/training_loss_progression.png`.
 
 ---
 
@@ -128,8 +163,9 @@ python scripts/run_boundary_extension.py --config configs/boundary_extension/hea
 
 ---
 
-## 6. Primary Contacts & Team Roles
+## 6. Project Ownership & Academic Attribution
 
-* **Student Team Leader (Workstream 1):** Codebase architecture, FDM solvers, and boundary extension.
-* **Technical Workstream Owner A (Workstream 2):** PINN training, DeepXDE integration, and verification against author reference CSV.
-* **Technical Workstream Owner B (Workstream 3):** Convergence analysis, statistical plotting, and final report compilation.
+* **Author & Sole Maintainer:** Harsh Sharma (Numerical Insight Lab, IIT Delhi)
+* **Transition Context:** The project was originally structured around three collaborative workstreams (Architecture/Solvers, Training/Residuals, Analysis/Validation). Following the administrative withdrawal of both student teammates from the course, all implementation, validation, research extension, unit testing, and documentation responsibilities were consolidated and completed independently.
+* **Primary Reference:** Aleks Krasowski et al., *Building Trust in PINNs: Error Estimation through Finite Difference Methods*, [arXiv:2603.15526](https://arxiv.org/abs/2603.15526) (2026).
+* **Licensing Notice:** The research paper text is governed by CC BY 4.0. The upstream code repository has no public software license (all rights reserved by the original authors; academic citation requested). Custom solvers, extensions, tests, and documentation are original contributions of the Numerical Insight Lab.

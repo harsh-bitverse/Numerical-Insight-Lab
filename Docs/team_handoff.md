@@ -76,28 +76,32 @@ python scripts/run_boundary_extension.py --config configs/boundary_extension/hea
 
 ---
 
-## 5. Workstream Ownership & Task Allocation
+## 5. Workstream Ownership & Solo Consolidation
 
-### Workstream 1: Student Team Leader
+*Note on Administrative Transition:* This project was originally designed with three collaborative workstreams (Workstream 1: Student Team Leader, Workstream 2: Technical Owner A, Workstream 3: Technical Owner B). Following the administrative withdrawal of both teammates, all responsibilities were consolidated under **Harsh Sharma** (documented in [`Docs/solo_project_gap_audit.md`](file:///c:/Workspace/Research/NA%20Research%20work%20on%20PINN/Docs/solo_project_gap_audit.md)).
+
+### Historical Workstream Mapping & Current Completion Status:
+
+#### Workstream 1: Codebase Architecture & Solvers (Original Lead: Team Leader -> Now: Harsh Sharma)
 * **Scope:** Architectural integrity, code repository maintenance, and boundary extension.
-* **Immediate Tasks:**
-  1. Review `scripts/run_boundary_extension.py` and verify `InhomogeneousFDMSolverHeatEq`.
-  2. Lead final report polishing of Sections 7 (Extension) and 8 (Discussion).
-  3. Ensure no uncommitted working tree anomalies or untracked temporary files exist before packaging.
+* **Status:** **FULLY COMPLETED.**
+  * Implemented `InhomogeneousFDMSolverHeatEq` in [`scripts/run_boundary_extension.py`](file:///c:/Workspace/Research/NA%20Research%20work%20on%20PINN/scripts/run_boundary_extension.py).
+  * Implemented cryptographic cache module [`scripts/model_cache.py`](file:///c:/Workspace/Research/NA%20Research%20work%20on%20PINN/scripts/model_cache.py).
+  * Executed controlled boundary penalty sweep $\lambda_{\text{bc}} \in \{1, 10, 100, 1000\}$ in [`scripts/run_penalty_sweep.py`](file:///c:/Workspace/Research/NA%20Research%20work%20on%20PINN/scripts/run_penalty_sweep.py).
 
-### Workstream 2: Technical Workstream Owner A
-* **Scope:** Baseline reproduction, DeepXDE PINN training, and numerical validation.
-* **Immediate Tasks:**
-  1. Cross-verify the baseline verification table in Section 5 of the final report against `results/run_manifest.json`.
-  2. Verify the algebraic cancellation argument in Section 3.3 ($\Delta_{\text{FDM}} = u_{\text{true}} - u_{\text{FDM}}$).
-  3. Prepare oral defense notes on PINN loss formulation and model caching.
+#### Workstream 2: PINN Training & Baseline Verification (Original Lead: Workstream A -> Now: Harsh Sharma)
+* **Scope:** Baseline reproduction, DeepXDE PINN training, loss analysis, and numerical validation.
+* **Status:** **FULLY COMPLETED.**
+  * Replicated $33.80\times$ advantage on 1D Heat Equation; verified algebraic cancellation ($1.83 \times 10^{-15}$ diff).
+  * Generated continuous loss progression curves in [`figures/training_loss_progression.png`](file:///c:/Workspace/Research/NA%20Research%20work%20on%20PINN/figures/training_loss_progression.png) via [`scripts/plot_loss_curve.py`](file:///c:/Workspace/Research/NA%20Research%20work%20on%20PINN/scripts/plot_loss_curve.py).
+  * Prepared oral defense notes on loss formulation and training dynamics in [`Docs/viva_preparation.md`](file:///c:/Workspace/Research/NA%20Research%20work%20on%20PINN/Docs/viva_preparation.md).
 
-### Workstream 3: Technical Workstream Owner B
-* **Scope:** Grid-resolution analysis, convergence orders, and figure quality.
-* **Immediate Tasks:**
-  1. Verify the regression slopes ($p_{\text{res}} = 1.982$, $p_{\text{fdm}} = 1.990$) in Table 2.
-  2. Confirm formatting and resolution of `figures/grid_resolution_comparison.png` and `figures/boundary_condition_comparison.png` for PDF compilation.
-  3. Lead oral defense preparation on norm definitions (unweighted RMS vs continuous trapezoidal quadrature).
+#### Workstream 3: Grid Analysis, Regression & Quality Assurance (Original Lead: Workstream B -> Now: Harsh Sharma)
+* **Scope:** Grid-resolution analysis, convergence orders, standalone unit testing, and final report.
+* **Status:** **FULLY COMPLETED.**
+  * Confirmed second-order convergence ($p_{\text{res}} = 1.982$, $p_{\text{fdm}} = 1.990$) across $N_x \in [8, 256]$.
+  * Implemented standalone `pytest` invariant test suite [`tests/test_reproducibility.py`](file:///c:/Workspace/Research/NA%20Research%20work%20on%20PINN/tests/test_reproducibility.py) (8/8 passing).
+  * Implemented bit-for-bit raw output audit tool [`scripts/audit_penalty_sweep.py`](file:///c:/Workspace/Research/NA%20Research%20work%20on%20PINN/scripts/audit_penalty_sweep.py).
 
 ---
 
