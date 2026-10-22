@@ -15,7 +15,7 @@ Undergraduate Numerical Analysis Research Project
 
 ## 1. Project Overview
 
-Physics-Informed Neural Networks (PINNs) provide a mesh-free approach to differential equations, but evaluating their pointwise prediction error without analytical solutions remains an open challenge. This repository contains the complete, reproducible research package independently auditing and reproducing the residual-based finite-difference error estimation framework proposed by Krasowski et al. (2026), and contributing an original mathematical generalization to **soft boundary condition enforcement**.
+Physics-Informed Neural Networks (PINNs) provide a mesh-free approach to differential equations, but evaluating their pointwise prediction error without analytical solutions remains an open challenge. This repository contains the complete, reproducible research package independently auditing and reproducing the residual-based finite-difference error estimation framework proposed by Krasowski et al. (2026) across its 1D Heat Equation benchmark and discretization behavior, and contributing an original mathematical generalization to **soft boundary condition enforcement**.
 
 ### Key Scientific Results
 * **Baseline Reproduction:** Verified the $33.80\times$ accuracy advantage in estimator discrepancy for the residual-based estimator over direct-FDM comparison on the 1D Heat Equation benchmark ($N_x=64, N_t=64$, 10,000 Adam iterations, float64). Direct-FDM error matched the author reference CSV within near-machine-precision ($1.83 \times 10^{-15}$) via algebraic cancellation.

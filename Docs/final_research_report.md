@@ -1,9 +1,10 @@
-# Reproducing and Evaluating Finite-Difference Error Estimation in Physics-Informed Neural Networks
+# Reproducing and Evaluating Finite-Difference Error Estimation in Physics-Informed Neural Networks: A Focused Benchmark Study and Extension to Soft Boundary Constraints
 
 **Course:** Numerical Analysis Undergraduate Research Project  
 **Institution:** Indian Institute of Technology Delhi (IIT Delhi)  
-**Authors:** Student Team Leader [Placeholder: Student 1], Technical Workstream Owner A [Placeholder: Student 2], Technical Workstream Owner B [Placeholder: Student 3]  
-**Supervisor / Course Instructor:** [Placeholder: Course Instructor]  
+**Author & Sole Maintainer:** Harsh Sharma (Independent Study, Numerical Insight Lab, IIT Delhi)  
+**Workstream Transition Note:** Project originally conceived across three collaborative workstreams (Solvers, Training, Validation); consolidated and completed independently following course withdrawal of student teammates.  
+**Supervisor / Course Instructor:** [Course Instructor Placeholder]  
 **Date:** October 2026 (Course Submission Deadline: November 10, 2026)  
 **Project Repository:** `https://github.com/harsh-bitverse/Numerical-Insight-Lab`  
 **Primary Reference Paper:** Aleks Krasowski et al., *Building Trust in PINNs: Error Estimation through Finite Difference Methods*, [arXiv:2603.15526](https://arxiv.org/abs/2603.15526) (2026).  
@@ -13,7 +14,7 @@
 
 ## Abstract
 
-Physics-Informed Neural Networks (PINNs) have emerged as a flexible framework for solving differential equations, but evaluating their pointwise error without analytical solutions remains a significant open challenge. Recently, Krasowski et al. (arXiv:2603.15526) proposed a residual-based error estimation framework that integrates the PDE defect equation using classical Finite Difference Methods (FDM). In this study, we independently audit, reproduce, and critically evaluate this methodology. 
+Physics-Informed Neural Networks (PINNs) have emerged as a flexible framework for solving differential equations, but evaluating their pointwise error without analytical solutions remains a significant open challenge. Recently, Krasowski et al. (arXiv:2603.15526) proposed a residual-based error estimation framework that integrates the PDE defect equation using classical Finite Difference Methods (FDM). In this study, we independently audit, reproduce, and critically evaluate this methodology through a focused investigation of its 1D Heat Equation benchmark and discretization behavior, complemented by an original mathematical and empirical extension to soft boundary condition enforcement.
 
 First, we reproduce the 1D Heat Equation benchmark ($N_x=64, N_t=64$, 10,000 Adam iterations, float64), verifying the reported $\sim 33.80\times$ accuracy advantage of the residual-based estimator over direct-FDM numerical comparison ($\|e_{\text{true}} - e_{\text{res}}\|_{\text{RMS}} = 4.771 \times 10^{-6}$ vs. $\|u_{\text{true}} - u_{\text{FDM}}\|_{\text{RMS}} = 1.613 \times 10^{-4}$). Second, we execute a controlled grid-resolution study across coupled spatial-temporal refinement $N_x = N_t \in \{8, 16, 32, 64, 128, 256\}$, confirming asymptotic second-order convergence ($\mathcal{O}(h^2)$ with $p_{\text{res}} = 1.982$, $p_{\text{fdm}} = 1.990$ for $N_x \ge 32$) and demonstrating pre-asymptotic behavior ($p \approx 2.28$) on coarse grids ($N_x=8$). Third, we investigate a critical architectural limitation omitted in the original paper: the requirement of exact hard boundary constraints. We demonstrate that feeding a soft-constrained PINN into the authors' unmodified solver causes breakdown ($p = 0.00$, error stalling at $\mathcal{O}(10^{-2})$, and performing up to $262\times$ worse than direct FDM) because boundary departure is forcibly ignored. We mathematically formulate an inhomogeneous defect initial-boundary value problem (IBVP) that requires zero analytical ground truth and implement `InhomogeneousFDMSolverHeatEq`. Our generalized solver restores observed second-order convergence ($p = 1.99 \pm 0.01$) and elevates the residual estimator's advantage to $85.67\times$ (and between $84.8\times$ and $86.3\times$ across resolutions) over direct FDM. Fourth, in a controlled boundary penalty sweep $\lambda_{\text{bc}} \in \{1, 10, 100, 1000\}$ protected by cryptographic caching, we prove that inhomogeneous defect convergence remains second-order invariant ($p = 2.00 \pm 0.02$) across all penalty regimes, while revealing an empirical loss trade-off at $\lambda_{\text{bc}}=1000$ consistent with multi-objective gradient conflict pathologies.
 
@@ -27,9 +28,12 @@ To bridge this gap, Krasowski et al. (2026) proposed solving the linearized defe
 $$\mathcal{L}[e] = -R(x, t)$$
 using classical finite-difference methods (specifically Crank-Nicolson time stepping). The authors claim that solving for the error perturbation $e$ directly on a coarse grid is orders of magnitude more accurate than comparing the PINN against a direct numerical solution of the physical state $u$.
 
-### Research Questions
-In this undergraduate numerical analysis research project at IIT Delhi, we investigate:
-1. **Reproducibility:** Does the authors' implementation execute as reported, and do the baseline metrics match published claims and reference datasets?
+### Scope of Reproduction & Research Questions
+
+While the original study by Krasowski et al. (2026) discusses five linear PDEs (Heat, Wave, 1D/2D Poisson, and Drift-Diffusion) and explores semigroup certified bounds ($e_{\text{bound}}$), our numerical reproduction is deliberately and rigorously focused on the **1D Heat Equation benchmark** and its coupled spatial-temporal discretization behavior. The other PDE benchmarks from the paper were not re-simulated in our local experiments; their data are referenced from the authors' published dataset (`all_experiments_results_float64.csv`). This focused scope allows us to achieve deep numerical verification of the defect formulation, prove the algebraic cancellation property, and formulate an original mathematical extension to soft boundary constraints.
+
+Specifically, in this undergraduate numerical analysis research project at IIT Delhi, we investigate:
+1. **Focused Reproducibility:** Does the authors' implementation for the 1D Heat Equation benchmark execute as reported, and do the baseline metrics match published claims and reference datasets?
 2. **Grid-Resolution Behavior:** How does the finite-difference grid spacing $h = \Delta x = \Delta t$ govern the estimator's accuracy, what are the empirical versus asymptotic convergence orders, and does the advantage persist across untrained networks?
 3. **Boundary Condition Extension:** How does the residual error estimator perform when the PINN uses soft penalty boundary constraints rather than exact hard constraints? Can the defect framework be generalized to inhomogeneous boundary errors without requiring analytical ground truth?
 
@@ -225,6 +229,7 @@ To evaluate how boundary loss weighting influences the defect estimator, we exec
 * The method generalizes cleanly to soft-constrained PINNs *if and only if* inhomogeneous boundary and initial conditions are integrated.
 
 ### 8.2 What the Results Do Not Establish
+* **Reproduction Scope Boundary:** Our numerical reproduction is focused specifically on the 1D Heat Equation benchmark and its coupled spatial-temporal discretization convergence. While the original paper evaluated four additional benchmarks (1D Wave, 1D/2D Poisson, 1D Drift-Diffusion) and analytical certified bounds ($e_{\text{bound}}$), those additional equations were not re-simulated in our local experiments; their data are referenced from the authors' published dataset (`all_experiments_results_float64.csv`). Our empirical findings strictly validate the parabolic heat equation regime.
 * **Not a Certified Rigorous Bound:** $e_{\text{res}}$ is an *approximation* of error, not an analytical upper bound. While $e_{\text{bound}}$ provides guaranteed bounds via semigroup theory, it lacks spatial resolution.
 * **Coupled Refinement Trajectory:** The grid study tested coupled diagonal refinement ($N_x = N_t$). While this demonstrates the overall $\mathcal{O}(h^2)$ asymptotic behavior of the coupled Crank-Nicolson discretization, it does not experimentally isolate spatial discretization error from temporal stepping error.
 * **Limited Scope of Extension:** Experiments were conducted on the 1D Heat Equation. While the mathematical derivation extends to higher dimensions and other linear PDEs, nonlinear systems (e.g., Navier-Stokes) require Newton-Raphson defect linearization.
@@ -236,7 +241,7 @@ To evaluate how boundary loss weighting influences the defect estimator, we exec
 
 ## 9. Conclusion
 
-We have completed a comprehensive reproduction, mathematical audit, and scientific extension of finite-difference error estimation in PINNs. All primary baseline claims of Krasowski et al. (2026) were reproduced and verified against reference data within floating-point precision (and to near-machine-precision for deterministic FDM quantities via algebraic cancellation). Our investigation into boundary condition enforcement identified a critical failure mode in the upstream code when applied to soft-constrained PINNs ($p = 0.00$, stalling at $\mathcal{O}(10^{-2})$), which we resolved by implementing an inhomogeneous defect solver that requires zero analytical ground truth and elevates estimator advantage up to $92.83\times$ on the baseline grid. Parametric evaluation across $\lambda_{\text{bc}} \in \{1, 10, 100, 1000\}$ proved that the inhomogeneous estimator preserves second-order convergence ($p = 2.00 \pm 0.02$) unconditionally, even under severe optimization failure.
+We have completed a focused reproduction, mathematical audit, and scientific extension of finite-difference error estimation in PINNs centered on the 1D Heat Equation. The primary baseline claims of Krasowski et al. (2026) for the 1D Heat benchmark were reproduced and verified against reference data within floating-point precision (and to near-machine-precision for deterministic FDM quantities via algebraic cancellation). Our investigation into boundary condition enforcement identified a critical failure mode in the upstream code when applied to soft-constrained PINNs ($p = 0.00$, stalling at $\mathcal{O}(10^{-2})$), which we resolved by implementing an inhomogeneous defect solver that requires zero analytical ground truth and elevates estimator advantage up to $92.83\times$ on the baseline grid. Parametric evaluation across $\lambda_{\text{bc}} \in \{1, 10, 100, 1000\}$ proved that the inhomogeneous estimator preserves second-order convergence ($p = 2.00 \pm 0.02$) unconditionally, even under severe optimization failure.
 
 ---
 
