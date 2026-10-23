@@ -144,8 +144,8 @@ To evaluate how grid refinement impacts estimator accuracy, we executed a contro
 | | 128 | 0.007874 | $4.326 \times 10^{-1}$ | $5.071 \times 10^{-5}$ | $3.993 \times 10^{-5}$ | **0.79x** | **1.9973** | **1.9913** |
 | | 256 | 0.003922 | $4.334 \times 10^{-1}$ | $1.259 \times 10^{-5}$ | $9.934 \times 10^{-6}$ | **0.79x** | **1.9986** | **1.9956** |
 
-![Figure 1: Grid Resolution Convergence Study](figures/grid_resolution_comparison.png)  
-*Figure 1: Estimator discrepancy $\|\Delta\|_{\text{RMS}}$ versus grid spacing $\Delta x = \Delta t$ across spatial resolutions $N_x \in [8, 256]$. Shaded envelopes represent Sample Mean $\pm$ 1 Sample Standard Deviation ($n=10$ random seeds from `all_experiments_results_float64.csv`). Solid markers denote our measured runs (Seed 42).*
+![Figure 1: Grid-refinement convergence: trained PINN](figures/figure1_grid_convergence.png)  
+*Figure 1: Grid-refinement convergence study for the well-trained PINN ($10{,}000$ iterations, Seed 42). Estimator discrepancy $\|\Delta\|_{\text{RMS}}$ (discrete RMS) versus coupled grid spacing $h = \Delta x = \Delta t$ across spatial resolutions $N_x \in \{8, 16, 32, 64, 128, 256\}$. Circles denote the residual-based defect estimator $\|\Delta_{\text{res}}\|$, squares denote the direct-FDM discrepancy $\|\Delta_{\text{FDM}}\|$, and the dashed line indicates theoretical second-order $\mathcal{O}(h^2)$ convergence.*
 
 ### Analysis of Grid Study Findings:
 1. **Asymptotic Convergence Order:** Over the asymptotic range $N_x \in [32, 256]$, linear regression of $\ln(\|\Delta\|)$ against $\ln(h)$ yields asymptotic slopes of **$p_{\text{res}} = 1.9822$** and **$p_{\text{fdm}} = 1.9901$** for well-trained PINNs, and **$p_{\text{res}} = 1.9969$** and **$p_{\text{fdm}} = 1.9901$** for random initialization. This confirms theoretical $\mathcal{O}(h^2)$ Crank-Nicolson convergence along the tested coupled refinement path ($N_x = N_t, \Delta x = \Delta t = h$). *Methodological Clarification:* Because $\Delta x$ and $\Delta t$ were refined simultaneously, this study establishes the coupled rate $\mathcal{O}(\Delta x^2 + \Delta t^2) = \mathcal{O}(h^2)$ rather than independently separating spatial from temporal convergence orders.
@@ -188,8 +188,8 @@ $$e(x, 0) = u_0(x) - \hat{u}(x, 0), \quad e(0, t) = 0 - \hat{u}(0, t), \quad e(1
 | Soft BC (Naive Homog. - Failure) | 64 | $1.227 \times 10^{-2}$ | $1.386 \times 10^{-2}$ | $1.048 \times 10^{-2}$ | $1.613 \times 10^{-4}$ | **0.02x** | **$p = 0.00$ (Stalled)** |
 | Soft BC (Naive Homog. - Failure) | 128 | $1.228 \times 10^{-2}$ | $1.386 \times 10^{-2}$ | $1.047 \times 10^{-2}$ | $3.993 \times 10^{-5}$ | **0.0038x** | **$p = 0.00$ (Stalled)** |
 
-![Figure 2: Boundary Condition Extension Comparison](figures/boundary_condition_comparison.png)  
-*Figure 2: Comparative evaluation of Hard vs. Soft BC error estimation. (a) Spatial error profile slice at $t=0.5$. (b) Boundary error time series $e(0, t)$ along $x=0$. (c) Estimator discrepancy versus grid spacing $\Delta x = \Delta t$. (d) Advantage factor across grid resolutions.*
+![Figure 2: Soft boundary conditions: estimator comparison](figures/figure2_soft_boundary_comparison.png)  
+*Figure 2: Estimator discrepancy $\|\Delta\|_{\text{RMS}}$ (discrete RMS) across grid resolutions $N_x = N_t \in \{16, 32, 64, 128\}$ for the soft-constrained PINN ($\lambda_{\text{bc}} = 10$, Seed 42). Blue circles show the proposed inhomogeneous defect solver restoring second-order convergence, orange squares show the naive homogeneous solver stalling at an error floor of $\approx 1.05 \times 10^{-2}$ ($p = 0.00$), and green triangles show the direct-FDM numerical comparison baseline.*
 
 ### 7.4 Extension Findings:
 1. **Restoration of Second-Order Convergence:** `InhomogeneousFDMSolverHeatEq` restores observed second-order convergence ($p = 1.99 \pm 0.01$), tracking both interior error and boundary drift faithfully.
@@ -210,8 +210,8 @@ To evaluate how boundary loss weighting influences the defect estimator, we exec
 | **$\lambda_{\text{bc}} = 100$** | $6.354 \times 10^{-3}$ | $1.613 \times 10^{-4}$ | $1.700 \times 10^{-5}$ | **$2.00$** | **$9.48\times$** | $6.099 \times 10^{-3}$ | $0.07$ | $0.026\times$ |
 | **$\lambda_{\text{bc}} = 1000$** | $3.518 \times 10^{-1}$ | $1.613 \times 10^{-4}$ | $1.613 \times 10^{-4}$ | **$1.98$** | **$1.00\times$** | $3.516 \times 10^{-1}$ | $0.00$ | $0.00046\times$ |
 
-![Figure 3: Boundary Penalty Sweep Comparison](figures/penalty_sweep_comparison.png)  
-*Figure 3: Controlled boundary penalty sweep across $\lambda_{\text{bc}} \in \{1, 10, 100, 1000\}$. (a) Inhomogeneous estimator convergence ($p \approx 2.00$). (b) Naive homogeneous estimator error stalling ($p \approx 0.00$). (c) Trade-off between boundary conformity and interior solution error. (d) Estimator advantage factor $\eta$ over direct FDM.*
+![Figure 3: Boundary-penalty sensitivity (single seed)](figures/figure3_penalty_sensitivity.png)  
+*Figure 3: Boundary penalty sensitivity study on a single random seed ($\text{seed}=42$, $64 \times 64$ grid). Estimator advantage factor $\eta = \|\Delta_{\text{FDM}}\| / \|\Delta_{\text{inhom}}\|$ of the inhomogeneous defect solver over direct FDM as a function of boundary penalty weight $\lambda_{\text{bc}} \in \{1, 10, 100, 1000\}$. The advantage scales from $92.83\times$ at $\lambda_{\text{bc}}=1$ down to parity ($1.00\times$) at $\lambda_{\text{bc}}=1000$, where initial condition loss competition causes the defect equation to degenerate into the original heat equation.*
 
 #### Core Discoveries from the Penalty Sweep:
 1. **Order Consistency of the Inhomogeneous Estimator:** In our experiments, the inhomogeneous defect solver exhibited approximately second-order convergence ($p = 2.00 \pm 0.02$) across the four penalty settings investigated. For these tested configurations, the Crank-Nicolson discretization error remained stable despite significant neural training variations.
