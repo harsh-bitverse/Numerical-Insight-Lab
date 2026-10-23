@@ -77,27 +77,27 @@ python scripts/run_boundary_extension.py --config configs/boundary_extension/hea
 
 ---
 
-## 5. Workstream Ownership & Solo Consolidation
+## 5. Workstream Ownership & Task Allocation
 
-*Note on Administrative Transition:* This project was originally designed with three collaborative workstreams (Workstream 1: Student Team Leader, Workstream 2: Technical Owner A, Workstream 3: Technical Owner B). Following the administrative withdrawal of both teammates, all responsibilities were consolidated under **Harshith N** (documented in [`Docs/solo_project_gap_audit.md`](file:///c:/Workspace/Research/NA%20Research%20work%20on%20PINN/Docs/solo_project_gap_audit.md)).
+*Collaborative Workstream Structure:* This project was organized across three collaborative workstreams: Workstream 1 (Harshith N), Workstream 2 (Nilesh Kumar Verma), and Workstream 3 (Devesh Saini).
 
-### Historical Workstream Mapping & Current Completion Status:
+### Workstream Mapping & Completion Status:
 
-#### Workstream 1: Codebase Architecture & Solvers (Original Lead: Team Leader -> Now: Harshith N)
+#### Workstream 1: Codebase Architecture & Solvers (Lead: Harshith N)
 * **Scope:** Architectural integrity, code repository maintenance, and boundary extension.
 * **Status:** **FULLY COMPLETED.**
   * Implemented `InhomogeneousFDMSolverHeatEq` in [`scripts/run_boundary_extension.py`](file:///c:/Workspace/Research/NA%20Research%20work%20on%20PINN/scripts/run_boundary_extension.py).
   * Implemented cryptographic cache module [`scripts/model_cache.py`](file:///c:/Workspace/Research/NA%20Research%20work%20on%20PINN/scripts/model_cache.py).
   * Executed controlled boundary penalty sweep $\lambda_{\text{bc}} \in \{1, 10, 100, 1000\}$ in [`scripts/run_penalty_sweep.py`](file:///c:/Workspace/Research/NA%20Research%20work%20on%20PINN/scripts/run_penalty_sweep.py).
 
-#### Workstream 2: PINN Training & Baseline Verification (Original Lead: Workstream A -> Now: Harshith N)
+#### Workstream 2: PINN Training & Baseline Verification (Lead: Nilesh Kumar Verma)
 * **Scope:** Baseline reproduction, DeepXDE PINN training, loss analysis, and numerical validation.
 * **Status:** **FULLY COMPLETED.**
   * Replicated $33.80\times$ advantage on 1D Heat Equation; verified algebraic cancellation ($1.83 \times 10^{-15}$ diff).
   * Generated continuous loss progression curves in [`figures/training_loss_progression.png`](file:///c:/Workspace/Research/NA%20Research%20work%20on%20PINN/figures/training_loss_progression.png) via [`scripts/plot_loss_curve.py`](file:///c:/Workspace/Research/NA%20Research%20work%20on%20PINN/scripts/plot_loss_curve.py).
   * Prepared oral defense notes on loss formulation and training dynamics in [`Docs/viva_preparation.md`](file:///c:/Workspace/Research/NA%20Research%20work%20on%20PINN/Docs/viva_preparation.md).
 
-#### Workstream 3: Grid Analysis, Regression & Quality Assurance (Original Lead: Workstream B -> Now: Harshith N)
+#### Workstream 3: Grid Analysis, Regression & Quality Assurance (Lead: Devesh Saini)
 * **Scope:** Grid-resolution analysis, convergence orders, standalone unit testing, and final report.
 * **Status:** **FULLY COMPLETED.**
   * Confirmed second-order convergence ($p_{\text{res}} = 1.982$, $p_{\text{fdm}} = 1.990$) across $N_x \in [8, 256]$.

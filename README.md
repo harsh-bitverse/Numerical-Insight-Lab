@@ -167,6 +167,6 @@ python scripts/plot_loss_curve.py
 
 * **Author and Collaborators:** Harshith N, Nilesh Kumar Verma, Devesh Saini
 * **Department & Institution:** Department of Chemical Engineering, Indian Institute of Technology Delhi (IIT Delhi)
-* **Transition Context:** The project was originally structured around three collaborative workstreams (Architecture/Solvers, Training/Residuals, Analysis/Validation). Following the administrative withdrawal of both student teammates from the course, all implementation, validation, research extension, unit testing, and documentation responsibilities were consolidated and completed independently.
+* **Workstream Collaboration:** The project was structured across three collaborative workstreams: Architecture/Solvers, Training/Residuals, and Analysis/Validation.
 * **Primary Reference:** Aleks Krasowski et al., *Building Trust in PINNs: Error Estimation through Finite Difference Methods*, [arXiv:2603.15526](https://arxiv.org/abs/2603.15526) (2026).
 * **Licensing Notice:** The research paper text is governed by CC BY 4.0. The upstream code repository has no public software license (all rights reserved by the original authors; academic citation requested). Custom solvers, extensions, tests, and documentation are original contributions of the Numerical Insight Lab.
