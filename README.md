@@ -9,7 +9,6 @@ Undergraduate Numerical Analysis Research Project
 **Institution:** Indian Institute of Technology Delhi (IIT Delhi)  
 **Primary Paper:** *Building Trust in PINNs: Error Estimation through Finite Difference Methods* ([arXiv:2603.15526](https://arxiv.org/abs/2603.15526), 2026)  
 **Upstream Repository:** [`aleks-krasowski/pinn-fdm-error-estimation`](https://github.com/aleks-krasowski/pinn-fdm-error-estimation) (Pinned Snapshot Commit `460d66bc`)  
-**Submission Deadline:** November 10, 2026
 
 ---
 
